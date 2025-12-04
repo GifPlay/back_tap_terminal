@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PerfilesExport;
 use App\Models\Perfil;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PerfilController extends Controller
 {
@@ -21,6 +24,18 @@ class PerfilController extends Controller
         }
 
         return response()->json($perfil);
+    }
+
+    static public function exportPerfilExcel()
+    {
+        return Excel::download(new PerfilesExport(), 'perfiles.xlsx');
+    }
+
+    static public function exportPerfilPdf()
+    {
+        $perfiles = Perfil::all();
+        $pdf = Pdf::loadView('exporter.perfiles', compact('perfiles'));
+        return $pdf->download('perfiles.pdf');
     }
 
     public function store(Request $request){

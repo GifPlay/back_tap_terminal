@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductosExport;
 use App\Models\Producto;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductoController extends Controller
 {
@@ -21,6 +24,18 @@ class ProductoController extends Controller
         }
 
         return response()->json($producto);
+    }
+
+    public function exportProductosExcel()
+    {
+        return Excel::download(new ProductosExport, 'productos.xlsx');
+    }
+
+    public function exportProductosPdf()
+    {
+        $productos = Producto::all();
+        $pdf = Pdf::loadView('exporter.productos', compact('productos'));
+        return $pdf->download('productos.pdf');
     }
 
     public function store(Request $request){
@@ -97,4 +112,6 @@ class ProductoController extends Controller
 
         return response()->json(['message' => 'Producto eliminado']);
     }
+
+
 }

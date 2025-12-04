@@ -16,6 +16,7 @@ class Perfil extends Model
         'created_at',
     ];
 
+
     protected static function boot()
     {
         parent::boot();

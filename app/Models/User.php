@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\Authenticatable;
+use MongoDB\Laravel\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
-use MongoDB\Laravel\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
-class User extends Authenticatable
+class User extends Model implements  AuthenticatableContract, JWTSubject
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Authenticatable;
 
     protected $collection = 'users';
     protected $connection = 'mongodb';
@@ -17,12 +19,14 @@ class User extends Authenticatable
     protected $fillable = [
         'codigo',
         'usuario',
-        'password',
         'nombre',
         'telefono',
         'fotoPerfil',
         'perfiles',
-        'created_at',
+        'name',
+        'email',
+        'password',
+        'role'
     ];
 
     protected $hidden = [
@@ -34,9 +38,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function getAuthPassword()
+    public function getJWTIdentifier()
     {
-        return $this->password;
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [
+            'role' => $this->role
+        ];
     }
 
     protected static function boot()
