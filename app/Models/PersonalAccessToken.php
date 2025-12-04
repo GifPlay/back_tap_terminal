@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Jenssegers\Mongodb\Eloquent\Model;
-use Laravel\Sanctum\TransientToken;
+use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
+use MongoDB\Laravel\Eloquent\Model;
 
 class PersonalAccessToken extends Model
 {
@@ -20,28 +20,28 @@ class PersonalAccessToken extends Model
     ];
 
     protected $casts = [
-        'abilities' => 'array',
         'last_used_at' => 'datetime',
     ];
 
-    public function tokenable()
+    public static function findToken($token)
     {
-        return $this->morphTo();
+        if (strpos($token, '|') !== false) {
+            [$id, $plainTextToken] = explode('|', $token, 2);
+
+            $instance = static::find($id);
+
+            if (! $instance) {
+                return null;
+            }
+
+            return hash_equals($instance->token, hash('sha256', $plainTextToken))
+                ? $instance
+                : null;
+        }
+
+        return static::where('token', hash('sha256', $token))->first();
     }
 
-    public function can($ability)
-    {
-        return in_array('*', $this->abilities ?? []) ||
-            in_array($ability, $this->abilities ?? []);
-    }
 
-    public function cant($ability)
-    {
-        return !$this->can($ability);
-    }
-
-    public function toTransient()
-    {
-        return new TransientToken($this->abilities);
-    }
 }
+
