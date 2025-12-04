@@ -7,30 +7,45 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
 //Auth
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/recuperar-password', [AuthController::class, 'recuperarPassword']);
+Route::post('login', [AuthController::class, 'login']);
+Route::post('logout', [AuthController::class, 'logout']);
+Route::middleware('auth:api')->get('me', [AuthController::class, 'me']);
 
 
-    //Usuarios
-    Route::get('/usuarios', [UsuarioController::class, 'index']);
-    Route::get('/usuarios/{id}', [UsuarioController::class, 'show']);
-    Route::post('/usuarios', [UsuarioController::class, 'store']);
-    Route::put('/usuarios/{id}', [UsuarioController::class, 'update']);
-    Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy']);
-    //Productos
-    Route::get('/productos', [ProductoController::class, 'index']);
-    Route::get('/productos/{id}', [ProductoController::class, 'show']);
-    Route::post('/productos', [ProductoController::class, 'store']);
-    Route::put('/productos/{id}', [ProductoController::class, 'update']);
-    Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
+Route::middleware(['auth:api'])->get('/usuarios', [UsuarioController::class, 'index']);
+Route::middleware(['auth:api'])->get('/productos', [ProductoController::class, 'index']);
 
-    //Perfiles
-    Route::get('/perfiles', [PerfilController::class, 'index']);
-    Route::get('/perfiles/{id}', [PerfilController::class, 'show']);
-    Route::post('/perfiles', [PerfilController::class, 'store']);
-    Route::put('/perfiles/{id}', [PerfilController::class, 'update']);
-    Route::delete('/perfiles/{id}', [PerfilController::class, 'destroy']);
 
-    Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/export/productos/excel', [ProductoController::class, 'exportProductosExcel']);
+    Route::get('/export/productos/pdf', [ProductoController::class, 'exportProductosPdf']);
+
+    Route::get('/export/usuarios/excel', [UsuarioController::class, 'exportUsuariosExcel']);
+    Route::get('/export/usuarios/pdf', [UsuarioController::class, 'exportUsuariosPdf']);
+});
+
+Route::get('/export/perfiles/excel', [PerfilController::class, 'exportPerfilExcel']);
+Route::get('/export/perfiles/pdf', [PerfilController::class, 'exportPerfilPdf']);
+
+//Usuarios
+Route::get('/usuarios/{id}', [UsuarioController::class, 'show']);
+Route::post('/usuarios', [UsuarioController::class, 'store']);
+Route::put('/usuarios/{id}', [UsuarioController::class, 'update']);
+Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy']);
+Route::post('/foto/usuarios/{id}', [UsuarioController::class, 'uploadFoto']);
+
+//Productos
+Route::get('/productos/{id}', [ProductoController::class, 'show']);
+Route::post('/productos', [ProductoController::class, 'store']);
+Route::put('/productos/{id}', [ProductoController::class, 'update']);
+Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
+
+//Perfiles
+Route::get('/perfiles', [PerfilController::class, 'index']);
+Route::get('/perfiles/{id}', [PerfilController::class, 'show']);
+Route::post('/perfiles', [PerfilController::class, 'store']);
+Route::put('/perfiles/{id}', [PerfilController::class, 'update']);
+Route::delete('/perfiles/{id}', [PerfilController::class, 'destroy']);
+
 
 
