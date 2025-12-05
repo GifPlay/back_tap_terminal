@@ -5,6 +5,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordController;
 
 //Auth
 Route::post('login', [AuthController::class, 'login']);
@@ -48,6 +49,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('/perfiles/{id}', [PerfilController::class, 'destroy']);
 });
 
+
+Route::post('/forgot-password', [PasswordController::class, 'forgotPassword']);
+Route::post('/reset-password', [PasswordController::class, 'resetPassword']);
 
 
 
